@@ -9,7 +9,8 @@
 ## UX
 [] -s is required is -S "!@#" this needs polished out
 [] -p --prompt option for interactive execution
-
+[] masking option?
+[] copy to clipboard option?
 
 ## Bugs
 [] Fix Symbol bug were it doesnt respect the symbols provided by -S
@@ -19,6 +20,7 @@
 [] Spell Check
 [] Check debugging statements / remove
 [] Remove comments that are from just learning the langauge
+[] Create functions were it makes sense and clean up main
 
 ## Completion
 [] compile and get instructions on downloading / running

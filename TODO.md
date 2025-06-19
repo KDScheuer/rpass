@@ -1,10 +1,10 @@
 # RPass TODO
 
 ## Core Function
-[] error handling
+[X] error handling
 [] test cross platform (rocky box and windows box)
-[] ensure best random algorithm is being used
-[] ensure a complexity is meant i.e. min of 2 of each type
+[X] ensure best random algorithm is being used
+[X] ensure a complexity is meant i.e. min of 2 of each type
 
 ## UX
 [X] -s is required is -S "!@#" this needs polished out

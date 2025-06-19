@@ -9,6 +9,25 @@ import (
 	"time"
 )
 
+type symbolFlag struct {
+	value string
+	set bool
+}
+
+func (s *symbolFlag) String() string {
+	return s.value
+}
+
+func (s *symbolFlag) Set(val string) error {
+	s.set = true
+	if val == "" {
+		s.value = "default" 
+	} else {
+		s.value = val
+	}
+	return nil
+}
+
 func main() {
 
 	// Defining Character Sets
@@ -24,13 +43,41 @@ func main() {
 	upper := flag.Bool("u", false, "Include uppercase letters")
 	lower := flag.Bool("x", false, "Include lowercase letters")
 	number := flag.Bool("n", false, "Include numbers")
-	symbols := flag.Bool("s", false, "Include symbols")
-	allowedSymbols := flag.String("S", symbolSet, "Custom symbols to include")
+	// symbols := flag.Bool("s", false, "Include symbols")
+	var sFlag symbolFlag 
+	flag.Var(&sFlag, "s", "Custom symbols to include (optional)")
+	// allowedSymbols := flag.String("S", "default", "Custom symbols to include")
 	flag.Parse()
+
+
+	var specialSymbols string = symbolSet
+	symbols := false
+
+	if sFlag.set {
+		if sFlag.value != "default" {
+			specialSymbols = sFlag.value
+			symbols = true
+		} else {
+			symbols = true
+		}
+	}
+
+	// // if custom symbols are passed check if any other flags were passed -u -x -n and if so ensure -s is true
+	// if (*upper || *lower || *number) && *symbols {
+
+	// }
+
+	// if nothing is passed then use all character sets
+	if !*upper && !*lower && !*number && !symbols {
+		*upper = true
+		*lower = true
+		*number = true
+		symbols = true
+	}
 
 	// Creating map to remove duplicate symbols to preserve the odds each avalible char can be selected
 	symbolMap := make(map[rune]bool)
-	for _, r := range *allowedSymbols {
+	for _, r := range specialSymbols {
 	    symbolMap[r] = true
 	}
 
@@ -41,20 +88,12 @@ func main() {
 	}
 	fmt.Println(dedupedSymbols)
 
-	// Checking if arguments were provided and mapping those character sets	
+	// Setting Character Sets	
 	var charset string
-	if *upper {
-		charset += upperSet
-	}
-	if *lower {
-		charset += lowerSet
-	}
-	if *number {
-		charset += numberSet
-	}
-	if *symbols {
-		charset += dedupedSymbols
-	}
+	if *upper { charset += upperSet }
+	if *lower { charset += lowerSet	}
+	if *number { charset += numberSet}
+	if symbols { charset += dedupedSymbols	}
 
 	// if charset == "" {
 	// 	fmt.Println("No character sets selected. Enable at least one.")
@@ -62,9 +101,9 @@ func main() {
 	// }
 
 	// If no arguments were entered using all character sets
-	if !*upper && !*lower && !*number && !*symbols {
-		charset += upperSet + lowerSet + numberSet + symbolSet
-	}
+	// if !*upper && !*lower && !*number && !*symbols {
+	// 	charset += upperSet + lowerSet + numberSet + symbolSet
+	// }
 
 	rand.Seed(time.Now().UnixNano())
 	password := make([]byte, *length)
@@ -74,21 +113,34 @@ func main() {
 	fmt.Println(string(password))
 }
 
-func preprocessArgs() {   
+func preprocessArgs() {
 	var newArgs []string
-	// Iterate over OS Args excluding 0 as that is the program name
-    for _, arg := range os.Args[1:] {
-		// Checking if args were combined (i.e. -unx)
-        if strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "--") && len(arg) > 2 {
-            // Iterate through each arg in the combined argument and seperate them
-            for _, ch := range arg[1:] {
-                newArgs = append(newArgs, "-"+string(ch))
-            }
+
+	// First, expand combined short flags
+	for _, arg := range os.Args[1:] {
+		if strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "--") && len(arg) > 2 {
+			for _, ch := range arg[1:] {
+				newArgs = append(newArgs, "-"+string(ch))
+			}
 		} else {
 			newArgs = append(newArgs, arg)
 		}
 	}
-	// Remake the arg list starting with the os name and each argument indivdually (i.e. rpass -u -x -n)
-	os.Args = append([]string{os.Args[0]}, newArgs...)
+
+	// Then, inject "" after any -s with no explicit value
+	finalArgs := []string{os.Args[0]}
+	for i := 0; i < len(newArgs); i++ {
+		arg := newArgs[i]
+		finalArgs = append(finalArgs, arg)
+
+		if arg == "-s" {
+			// If next arg is missing or is another flag, inject empty string
+			if i+1 >= len(newArgs) || strings.HasPrefix(newArgs[i+1], "-") {
+				finalArgs = append(finalArgs, "")
+			}
+		}
+	}
+
+	os.Args = finalArgs
 	fmt.Println(os.Args)
 }

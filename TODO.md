@@ -13,8 +13,8 @@
 [] copy to clipboard option?
 
 ## Bugs
-[] Fix Symbol bug were it doesnt respect the symbols provided by -S
-
+[X] Fix Symbol bug were it doesnt respect the symbols provided by -S
+[X] Fix bug were if -s is passed with values that the password should contain upper lower and numbers as well
 
 ## Polish
 [] Spell Check

@@ -54,7 +54,13 @@ func main() {
 	symbols := false
 
 	if sFlag.set {
-		if sFlag.value != "default" {
+		if sFlag.value != "default" && (!*upper && !*lower && !*number) {
+			*upper = true
+			*lower = true
+			*number = true
+			symbols = true
+			specialSymbols = sFlag.value
+		} else if sFlag.value != "default" {
 			specialSymbols = sFlag.value
 			symbols = true
 		} else {

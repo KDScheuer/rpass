@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"math/rand"
+	// "math/rand"
+	"math/big"
+	"crypto/rand"
 	"os"
 	"strings"
 	// "time"
@@ -26,6 +28,23 @@ func (s *symbolFlag) Set(val string) error {
 		s.value = val
 	}
 	return nil
+}
+
+func secureRandChar(charset string) byte {
+	max := big.NewInt(int64(len(charset)))
+	n, err := rand.Int(rand.Reader, max)
+	if err != nil {
+		panic("Failed to generate secure random number")
+	}
+	return charset[n.Int64()]
+}
+
+func secureRandInt(max int) int64 {
+	n, err := rand.Int(rand.Reader, big.NewInt(int64(max)))
+	if err != nil {
+		panic("Failed to generate secure random index")
+	}
+	return n.Int64()
 }
 
 func main() {
@@ -132,7 +151,7 @@ func main() {
 	pickIndices := func(count int) []int {
 		indices := []int{}
 		for len(indices) < count {
-			idx := rand.Intn(*length)
+			idx := int(secureRandInt(*length))
 			if !assignedIndices[idx] {
 				assignedIndices[idx] = true
 				indices = append(indices, idx)
@@ -145,7 +164,7 @@ func main() {
 	fillType := func(charset string) {
 		indices := pickIndices(*minType)
 		for _, i := range indices {
-			password[i] = charset[rand.Intn(len(charset))]
+			password[i] = secureRandChar(charset)
 		}
 	}
 
@@ -157,7 +176,7 @@ func main() {
 	// Randomly fill and complete password
 	for i := 0; i < *length; i++ {
 		if password[i] == 0 {
-			password[i] = charset[rand.Intn(len(charset))]
+			password[i] = secureRandChar(charset)
 		}
 	}
 

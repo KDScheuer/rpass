@@ -4,13 +4,10 @@
 [] error handling
 [] test cross platform (rocky box and windows box)
 [] ensure best random algorithm is being used
-
+[] ensure a complexity is meant i.e. min of 2 of each type
 
 ## UX
-[] -s is required is -S "!@#" this needs polished out
-[] -p --prompt option for interactive execution
-[] masking option?
-[] copy to clipboard option?
+[X] -s is required is -S "!@#" this needs polished out
 
 ## Bugs
 [X] Fix Symbol bug were it doesnt respect the symbols provided by -S

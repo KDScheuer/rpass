@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"os"
 	"strings"
-	"time"
+	// "time"
 )
 
 type symbolFlag struct {
@@ -46,9 +46,9 @@ func main() {
 	// symbols := flag.Bool("s", false, "Include symbols")
 	var sFlag symbolFlag 
 	flag.Var(&sFlag, "s", "Custom symbols to include (optional)")
+	minType := flag.Int("t", 2, "Minimum occurances of each type selected (i.e. 3 upper, 3 lower)")
 	// allowedSymbols := flag.String("S", "default", "Custom symbols to include")
 	flag.Parse()
-
 
 	var specialSymbols string = symbolSet
 	symbols := false
@@ -111,12 +111,65 @@ func main() {
 	// 	charset += upperSet + lowerSet + numberSet + symbolSet
 	// }
 
-	rand.Seed(time.Now().UnixNano())
-	password := make([]byte, *length)
-	for i := range password {
-		password[i] = charset[rand.Intn(len(charset))]
+	// Checking if complexity requirements can be meant with the set password length
+	var enabledTypes int = 0
+	if *upper { enabledTypes++ }
+	if *lower { enabledTypes++ }
+	if *number { enabledTypes++ }
+	if symbols { enabledTypes++ }
+
+	if *minType * enabledTypes > *length {
+		fmt.Fprintf(os.Stderr, "Error: Can not satisfy required complexity of %d occurances of %d types in a %d character long password.\nIncrease the password length with -l or reduce complexity with -t\n", *minType, enabledTypes, *length)
+		os.Exit(1)
 	}
+
+	// Create password slice the length of the password
+	password := make([]byte, *length)
+	// Track assigned index's
+	assignedIndices := make(map[int]bool)
+	
+	// pick random indices in password where complexity is gaurnteed
+	pickIndices := func(count int) []int {
+		indices := []int{}
+		for len(indices) < count {
+			idx := rand.Intn(*length)
+			if !assignedIndices[idx] {
+				assignedIndices[idx] = true
+				indices = append(indices, idx)
+			}
+		}
+		return indices
+	}
+
+	// Fill guaranteed characters for each type at the random indices
+	fillType := func(charset string) {
+		indices := pickIndices(*minType)
+		for _, i := range indices {
+			password[i] = charset[rand.Intn(len(charset))]
+		}
+	}
+
+	if *upper { fillType(upperSet) }
+	if *lower { fillType(lowerSet) }
+	if *number { fillType(numberSet) }
+	if symbols { fillType(dedupedSymbols) }
+
+	// Randomly fill and complete password
+	for i := 0; i < *length; i++ {
+		if password[i] == 0 {
+			password[i] = charset[rand.Intn(len(charset))]
+		}
+	}
+
+	// Print password
 	fmt.Println(string(password))
+
+	// rand.Seed(time.Now().UnixNano())
+	// password := make([]byte, *length)
+	// for i := range password {
+	// 	password[i] = charset[rand.Intn(len(charset))]
+	// }
+	// fmt.Println(string(password))
 }
 
 func preprocessArgs() {

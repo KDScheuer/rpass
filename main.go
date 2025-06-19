@@ -48,6 +48,7 @@ func secureRandInt(max int) int64 {
 }
 
 func main() {
+	const version = "1.0.0"
 
 	// Defining Character Sets
 	upperSet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -66,8 +67,14 @@ func main() {
 	var sFlag symbolFlag 
 	flag.Var(&sFlag, "s", "Custom symbols to include (optional)")
 	minType := flag.Int("t", 2, "Minimum occurances of each type selected (i.e. 3 upper, 3 lower)")
+	checkVersion := flag.Bool("version", false, "Display the current version of rPass")
 	// allowedSymbols := flag.String("S", "default", "Custom symbols to include")
 	flag.Parse()
+
+	if *checkVersion {
+            fmt.Println("rPass version", version)
+            os.Exit(0)
+	}
 
 	var specialSymbols string = symbolSet
 	symbols := false

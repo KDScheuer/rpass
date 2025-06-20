@@ -1,15 +1,12 @@
 package main
 
 import (
+	"crypto/rand"
 	"flag"
 	"fmt"
-
-	// "math/rand"
-	"crypto/rand"
 	"math/big"
 	"os"
 	"strings"
-	// "time"
 )
 
 type symbolFlag struct {

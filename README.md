@@ -1,3 +1,13 @@
+<p align="center">
+
+![Go Version](https://img.shields.io/badge/go-1.24+-00ADD8?logo=go&logoColor=white)
+![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-informational)
+![Build](https://img.shields.io/badge/build-passing-brightgreen)
+[![Release](https://img.shields.io/github/v/release/KDScheuer/rpass)](https://github.com/KDScheuer/rpass/releases)
+
+</p>
+
 # RPass
 RPass is a lightweight, fast CLI utility written in Go for generating secure random passwords on demand.
 
